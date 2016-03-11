@@ -1,2 +1,2 @@
-# elmafile-filter
-Elasto Mania file filter
+# elma-rust
+Elasto Mania file handler crate for Rust.

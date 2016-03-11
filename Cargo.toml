@@ -1,4 +1,4 @@
 [package]
-name = "elmafile-filter"
+name = "elma"
 version = "0.0.1"
 authors = ["Roger Andersen <hexjelly@hexjelly.com>"]
