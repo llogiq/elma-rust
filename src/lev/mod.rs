@@ -1,3 +1,9 @@
+use std::io;
+use std::io::prelude::*;
+use std::fs::File;
+use std::path::Path;
+
+
 struct Position {
     x: i64,
     y: i64
@@ -29,10 +35,15 @@ struct Level {
     objects: Vec<Object>
 }
 
-pub fn load_lev () {
-    //
-}
+impl Level {
+    pub fn load_level (&self, filename: &str) {
+        let mut file = File::open(&filename).unwrap();
+        let mut s = String::new();
+        file.read_to_string(&mut s);
+    }
 
-pub fn save_lev (filename: String) {
-    //
+    pub fn save_lev (&self, filename: &str) {
+        let mut file = File::create(&filename).unwrap();
+        file.write_all(b"Hello, world!");
+    }
 }
