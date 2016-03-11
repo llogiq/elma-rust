@@ -1,2 +1,2 @@
-mod lev;
-mod rec;
+pub mod lev;
+pub mod rec;
