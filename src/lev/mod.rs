@@ -1,7 +1,6 @@
 use std::io;
 use std::io::prelude::*;
 use std::fs::File;
-use std::path::Path;
 
 
 struct Position {
@@ -27,7 +26,7 @@ struct Polygon {
     grass: bool
 }
 
-struct Level {
+pub struct Level {
     name: String,
     ground: String,
     sky: String,
@@ -36,10 +35,11 @@ struct Level {
 }
 
 impl Level {
-    pub fn load_level (&self, filename: &str) {
+    pub fn load_level (filename: &str) -> Level {
         let mut file = File::open(&filename).unwrap();
         let mut s = String::new();
         file.read_to_string(&mut s);
+        Level { name: String::from("test"), ground: String::from("test"), sky: String::from("test"), polygons: Vec::new(), objects: Vec::new() }
     }
 
     pub fn save_lev (&self, filename: &str) {

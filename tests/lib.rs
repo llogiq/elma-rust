@@ -1,9 +1,7 @@
 extern crate elma;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(4, add_two(2));
-    }
+#[test]
+fn main () {
+    let level = elma::lev::Level::load_level("tests/test.lev");
+    assert_eq!(true, true);
 }
