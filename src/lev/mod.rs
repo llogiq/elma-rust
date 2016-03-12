@@ -1,15 +1,17 @@
-use std::io;
-use std::io::prelude::*;
+use std::io::Read;
+use std::io::Write;
 use std::fs::File;
 
 const EOD: u32 = 0x0067103A;
 const EOF: u32 = 0x00845D52;
 
+/// Position struct shared between Object, Polygon and Picture
 pub struct Position {
     x: f64,
     y: f64
 }
 
+/// Type of object
 enum ObjectType {
     Apple,
     Exit,
@@ -39,6 +41,7 @@ pub struct Picture {
     clip: u32
 }
 
+/// Level struct that contains all level information
 pub struct Level {
     pub link: u32,
     pub integrity: Vec<f64>,
@@ -64,14 +67,14 @@ impl Level {
         }
     }
 
-    pub fn load_level (filename: &str) {
-        let mut file = File::open(&filename).unwrap();
+    pub fn load_level (&self, filename: &str) {
+        let mut file = File::open(filename).unwrap();
         let mut s = String::new();
-        file.read_to_string(&mut s);
+        file.read_to_string(&mut s).unwrap();
     }
 
     pub fn save_lev (&self, filename: &str) {
         let mut file = File::create(&filename).unwrap();
-        file.write_all(b"Hello, world!");
+        file.write_all(b"Hello, world!").unwrap();
     }
 }
