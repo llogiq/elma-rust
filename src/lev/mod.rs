@@ -2,10 +2,12 @@ use std::io;
 use std::io::prelude::*;
 use std::fs::File;
 
+const EOD: u32 = 0x0067103A;
+const EOF: u32 = 0x00845D52;
 
-struct Position {
-    x: i64,
-    y: i64
+pub struct Position {
+    x: f64,
+    y: f64
 }
 
 enum ObjectType {
@@ -16,30 +18,45 @@ enum ObjectType {
     Player
 }
 
-struct Object {
+pub struct Object {
     object_type: ObjectType,
     position: Position
 }
 
-struct Polygon {
+pub struct Polygon {
     points: Vec<Position>,
     grass: bool
 }
 
 pub struct Level {
-    name: String,
-    ground: String,
-    sky: String,
-    polygons: Vec<Polygon>,
-    objects: Vec<Object>
+    pub link: u32,
+    pub integrity: Vec<f64>,
+    pub name: String,
+    pub lgr: String,
+    pub ground: String,
+    pub sky: String,
+    pub polygons: Vec<Polygon>,
+    pub objects: Vec<Object>
 }
 
 impl Level {
-    pub fn load_level (filename: &str) -> Level {
+    pub fn new () -> Level {
+        Level {
+            link: 0,
+            integrity: Vec::new(),
+            name: String::new(),
+            lgr: String::new(),
+            ground: String::new(),
+            sky: String::new(),
+            polygons: Vec::new(),
+            objects: Vec::new()
+        }
+    }
+
+    pub fn load_level (filename: &str) {
         let mut file = File::open(&filename).unwrap();
         let mut s = String::new();
         file.read_to_string(&mut s);
-        Level { name: String::from("test"), ground: String::from("test"), sky: String::from("test"), polygons: Vec::new(), objects: Vec::new() }
     }
 
     pub fn save_lev (&self, filename: &str) {
