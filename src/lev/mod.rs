@@ -14,18 +14,29 @@ enum ObjectType {
     Apple,
     Exit,
     Killer,
-    Picture,
     Player
 }
 
 pub struct Object {
+    position: Position,
     object_type: ObjectType,
-    position: Position
+    gravity: u32,
+    animation: u32
 }
 
 pub struct Polygon {
-    points: Vec<Position>,
-    grass: bool
+    grass: bool,
+    vertex_count: u32,
+    vertices: Vec<Position>
+}
+
+pub struct Picture {
+    name: String,
+    texture: String,
+    mask: String,
+    position: Position,
+    distance: u32,
+    clip: u32
 }
 
 pub struct Level {
