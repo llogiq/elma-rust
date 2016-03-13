@@ -33,9 +33,9 @@ pub struct Polygon {
 }
 
 pub struct Picture {
-    name: String,
-    texture: String,
-    mask: String,
+    name: [u8; 10],
+    texture: [u8; 10],
+    mask: [u8; 10],
     position: Position,
     distance: u32,
     clip: u32
@@ -44,33 +44,40 @@ pub struct Picture {
 /// Level struct that contains all level information
 pub struct Level {
     pub link: u32,
-    pub integrity: Vec<f64>,
-    pub name: String,
-    pub lgr: String,
-    pub ground: String,
-    pub sky: String,
+    pub integrity: [f64; 4],
+    pub name: [u8; 51],
+    pub lgr: [u8; 16],
+    pub ground: [u8; 10],
+    pub sky: [u8; 10],
     pub polygons: Vec<Polygon>,
-    pub objects: Vec<Object>
+    pub objects: Vec<Object>,
+    pub pictures: Vec<Picture>
 }
 
 impl Level {
     pub fn new () -> Level {
         Level {
             link: 0,
-            integrity: Vec::new(),
-            name: String::new(),
-            lgr: String::new(),
-            ground: String::new(),
-            sky: String::new(),
+            integrity: [0.0f64; 4],
+            name: [0; 51],
+            lgr: [0; 16],
+            ground: [0; 10],
+            sky: [0; 10],
             polygons: Vec::new(),
-            objects: Vec::new()
+            objects: Vec::new(),
+            pictures: Vec::new()
         }
+    }
+
+    fn parse_level (&self, buffer: Vec<u8>) {
+
     }
 
     pub fn load_level (&self, filename: &str) {
         let mut file = File::open(filename).unwrap();
-        let mut s = String::new();
-        file.read_to_string(&mut s).unwrap();
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer);
+        self.parse_level(buffer);
     }
 
     pub fn save_lev (&self, filename: &str) {
