@@ -1,4 +1,8 @@
+use byteorder::{ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian};
 use super::Position;
+
+// Magic arbitrary number to signify end of replay file.
+const EOR: u32 = 0x00492F75;
 
 /// One frame of replay.
 struct Frame {
@@ -16,8 +20,10 @@ struct Frame {
     left_wheel_rotation: u8,
     /// Right wheel rotation. Range 0..255.
     right_wheel_rotation: u8,
-    /// Throttle or turn or both dunno.
-    dunno: u8,
+    /// Throttle.
+    throttle: bool,
+    /// Right direction. True = right, False = left.
+    right: bool,
     /// Spring sound effect volume.
     volume: u16
 }
@@ -34,9 +40,9 @@ pub struct Rec {
     /// Number of Frames in replay.
     frame_count: i32,
     /// Whether replay is multi-player or not.
-    multi: i32,
+    multi: bool,
     /// Whether replay is flag-tag or not.
-    flag_tag: i32,
+    flag_tag: bool,
     /// Random number to link with level file.
     link: u32,
     /// Full level filename.
@@ -60,8 +66,8 @@ impl Rec {
     pub fn new () -> Rec {
         Rec {
             frame_count: 0,
-            multi: 0,
-            flag_tag: 0,
+            multi: false,
+            flag_tag: false,
             link: 0,
             level: [0; 12],
             frames: Vec::new(),
