@@ -1,19 +1,12 @@
 use std::io::Read;
 use std::io::Write;
 use std::fs::File;
+use super::Position;
 
 // Magic arbitrary number; signifies end-of-data. Followed by Top10 list(s).
 const EOD: u32 = 0x0067103A;
 // Magic arbitrary number; signifies end-of-file.
 const EOF: u32 = 0x00845D52;
-
-/// Position struct shared between Object, Polygon and Picture.
-pub struct Position {
-    /// X-position.
-    x: f64,
-    /// Y-position.
-    y: f64
-}
 
 /// Type of object.
 enum ObjectType {
@@ -26,7 +19,7 @@ enum ObjectType {
 /// Object struct. Every level requires one ObjectType::Player Object and at least one ObjectType::Exit Object.
 pub struct Object {
     /// Position. See Position struct.
-    position: Position,
+    position: Position<f64>,
     /// Type of Object, see ObjectType.
     object_type: ObjectType,
     /// Applies to ObjectType::Apple only.
@@ -48,7 +41,7 @@ pub struct Polygon {
     /// Vertices in Polygon.
     vertex_count: u32,
     /// Vector with all vertices, see Position struct.
-    vertices: Vec<Position>
+    vertices: Vec<Position<f64>>
 }
 
 /// Picture struct.
@@ -60,7 +53,7 @@ pub struct Picture {
     /// Mask name.
     mask: [u8; 10],
     /// Position. See Position struct.
-    position: Position,
+    position: Position<f64>,
     /// Z-distance
     distance: u32,
     /// Clipping.
