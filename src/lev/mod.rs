@@ -2,16 +2,20 @@ use std::io::Read;
 use std::io::Write;
 use std::fs::File;
 
+// Magic arbitrary number; signifies end-of-data. Followed by Top10 list(s).
 const EOD: u32 = 0x0067103A;
+// Magic arbitrary number; signifies end-of-file.
 const EOF: u32 = 0x00845D52;
 
-/// Position struct shared between Object, Polygon and Picture
+/// Position struct shared between Object, Polygon and Picture.
 pub struct Position {
+    /// X-position.
     x: f64,
+    /// Y-position.
     y: f64
 }
 
-/// Type of object
+/// Type of object.
 enum ObjectType {
     Apple,
     Exit,
@@ -19,25 +23,51 @@ enum ObjectType {
     Player
 }
 
+/// Object struct. Every level requires one ObjectType::Player Object and at least one ObjectType::Exit Object.
 pub struct Object {
+    /// Position. See Position struct.
     position: Position,
+    /// Type of Object, see ObjectType.
     object_type: ObjectType,
+    /// Applies to ObjectType::Apple only.
+    ///
+    /// 0 = normal
+    /// 1 = gravity up
+    /// 2 = gravity down
+    /// 3 = gravity left
+    /// 4 = gravity right
     gravity: u32,
+    /// Applies to ObjectType::Apple only. Valid values are 1 to 9.
     animation: u32
 }
 
+/// Polygon struct.
 pub struct Polygon {
+    /// Grass polygon.
     grass: bool,
+    /// Vertices in Polygon.
     vertex_count: u32,
+    /// Vector with all vertices, see Position struct.
     vertices: Vec<Position>
 }
 
+/// Picture struct.
 pub struct Picture {
+    /// Picture name.
     name: [u8; 10],
+    /// Texture name.
     texture: [u8; 10],
+    /// Mask name.
     mask: [u8; 10],
+    /// Position. See Position struct.
     position: Position,
+    /// Z-distance
     distance: u32,
+    /// Clipping.
+    ///
+    /// 0 = unclipped
+    /// 1 = ground
+    /// 2 = sky
     clip: u32
 }
 
@@ -66,7 +96,13 @@ pub struct Level {
 }
 
 impl Level {
-    /// Build a new Level
+    /// Build a new Level.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let level = elma::lev::Level::new();
+    /// ```
     pub fn new () -> Level {
         Level {
             raw: Vec::new(),
