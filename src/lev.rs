@@ -2,6 +2,8 @@ use std::io::{ Cursor, Read, Write };
 use std::fs::File;
 use byteorder::{ ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian };
 use super::Position;
+use super::read_n;
+use super::rand::Rng;
 
 // Magic arbitrary number; signifies end-of-data. Followed by Top10 list(s).
 const EOD: u32 = 0x0067103A;
@@ -133,9 +135,8 @@ impl Level {
 
     /// Parses the raw binary data into Level struct fields.
     fn parse_level (&mut self) {
-        use super::read_n;
-
         let mut buffer = Cursor::new(&self.raw);
+        let data :Vec<u8>;
         // Elma = POT14, Across = POT06.
         // TODO: make Across compatible in 2025.
         let version = read_n(&mut buffer, 5);
@@ -144,6 +145,11 @@ impl Level {
             [80, 79, 84, 48, 54] => "Across".to_string(),
             _ => "".to_string()
         };
+
+        // Link.
+        data = read_n(&mut buffer, 2);
+        let link = buffer.read_u32::<LittleEndian>().unwrap();
+        self.link = link;
     }
 
     /// Combines the Level struct fields to generate the raw binary data.

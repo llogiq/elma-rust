@@ -1,5 +1,6 @@
 #![feature(slice_patterns)]
 extern crate byteorder;
+extern crate rand;
 
 use std::io::Read;
 

@@ -5,3 +5,4 @@ authors = ["Roger Andersen <hexjelly@hexjelly.com>"]
 
 [dependencies]
 byteorder = "0.5.0"
+rand = "*"
