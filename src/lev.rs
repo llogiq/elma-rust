@@ -1,4 +1,4 @@
-use std::io::{ Read, Write };
+use std::io::{ self, BufReader, Read, Write };
 use std::fs::File;
 use byteorder::{ ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian };
 use super::Position;
@@ -111,11 +111,6 @@ impl Level {
         }
     }
 
-    /// Parses raw binary level data from self.raw and populates Level fields with information.
-    fn parse_level (&self) {
-
-    }
-
     /// Loads a level file and returns a Level struct.
     ///
     /// # Examples
@@ -128,20 +123,31 @@ impl Level {
         let mut file = File::open(filename).unwrap();
         let mut buffer = Vec::new();
         file.read_to_end(&mut buffer).unwrap();
+        level.raw = buffer;
         level.parse_level();
         level
     }
 
+    /// Parses the raw binary data into Level struct fields.
+    fn parse_level (&self) {
+        // TODO: convert duh.
+    }
+
+    /// Combines the Level struct fields to generate the raw binary data.
+    fn convert_to_raw (&self) {
+        // TODO: convert duh.
+    }
+
     /// Converts all struct fields into raw binary form and returns it.
     pub fn get_raw (self) -> Vec<u8> {
-        // TODO: convert all fields.
-        self.parse_level();
+        self.convert_to_raw();
         self.raw
     }
 
-    /// Saves level as a file
+    /// Saves level as a file.
     pub fn save_lev (&self, filename: &str) {
+        self.convert_to_raw();
         let mut file = File::create(&filename).unwrap();
-        file.write_all(b"Hello, world!").unwrap();
+        // TODO: write stuff.
     }
 }

@@ -18,7 +18,7 @@ mod tests {
 
     #[test]
     fn test_lev_load_level () {
-        let level = lev::Level::load_level("test.lev");
+        let level = lev::Level::load_level("tests/test.lev");
         assert_eq!(0, 1);
     }
 
