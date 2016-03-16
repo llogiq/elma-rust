@@ -1,7 +1,6 @@
-use std::io::Read;
-use std::io::Write;
+use std::io::{ Read, Write };
 use std::fs::File;
-use byteorder::{ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian};
+use byteorder::{ ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian };
 use super::Position;
 
 // Magic arbitrary number; signifies end-of-data. Followed by Top10 list(s).
