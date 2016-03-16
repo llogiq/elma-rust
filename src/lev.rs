@@ -1,4 +1,4 @@
-use std::io::{ self, BufReader, Read, Write };
+use std::io::{ Cursor, Read, Write };
 use std::fs::File;
 use byteorder::{ ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian };
 use super::Position;
@@ -66,6 +66,8 @@ pub struct Picture {
 
 /// Level struct that contains all level information.
 pub struct Level {
+    /// Elma or Across level.
+    pub version: String,
     /// Raw binary data of a loaded or finalized constructed level.
     pub raw: Vec<u8>,
     /// Random number that links level file to replay files.
@@ -73,7 +75,7 @@ pub struct Level {
     /// Contains four integrity checks (See create_integrity()).
     pub integrity: [f64; 4],
     /// Level name.
-    pub name: [u8; 51],
+    pub name: String,
     /// LGR file name.
     pub lgr: [u8; 16],
     /// Ground texture name.
@@ -98,10 +100,11 @@ impl Level {
     /// ```
     pub fn new () -> Level {
         Level {
+            version: String::from("Elma"),
             raw: Vec::new(),
             link: 0,
             integrity: [0.0f64; 4],
-            name: [0; 51],
+            name: String::new(),
             lgr: [0; 16],
             ground: [0; 10],
             sky: [0; 10],
@@ -129,8 +132,18 @@ impl Level {
     }
 
     /// Parses the raw binary data into Level struct fields.
-    fn parse_level (&self) {
-        // TODO: convert duh.
+    fn parse_level (&mut self) {
+        use super::read_n;
+
+        let mut buffer = Cursor::new(&self.raw);
+        // Elma = POT14, Across = POT06.
+        // TODO: make Across compatible in 2025.
+        let version = read_n(&mut buffer, 5);
+        self.version = match version.as_slice() {
+            [80, 79, 84, 49, 52] => "Elma".to_string(),
+            [80, 79, 84, 48, 54] => "Across".to_string(),
+            _ => "".to_string()
+        };
     }
 
     /// Combines the Level struct fields to generate the raw binary data.

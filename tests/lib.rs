@@ -17,9 +17,16 @@ mod tests {
     }
 
     #[test]
-    fn test_lev_load_level () {
+    fn test_lev_load_level_1 () {
         let level = lev::Level::load_level("tests/test.lev");
-        assert_eq!(0, 1);
+        assert_eq!(level.version, "Elma".to_string());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_lev_load_level_2 () {
+        let level = lev::Level::load_level("tests/test.lev");
+        assert_eq!(level.version, "Across".to_string());
     }
 
     #[test]
