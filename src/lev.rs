@@ -64,32 +64,32 @@ pub struct Picture {
     clip: u32
 }
 
-/// Level struct that contains all level information
+/// Level struct that contains all level information.
 pub struct Level {
-    /// Raw binary data of a loaded or finalized constructed level
+    /// Raw binary data of a loaded or finalized constructed level.
     pub raw: Vec<u8>,
-    /// Random number that links level file to replay files
+    /// Random number that links level file to replay files.
     pub link: u32,
-    /// Contains four integrity checks (See create_integrity())
+    /// Contains four integrity checks (See create_integrity()).
     pub integrity: [f64; 4],
-    /// Level name
+    /// Level name.
     pub name: [u8; 51],
-    /// LGR file name
+    /// LGR file name.
     pub lgr: [u8; 16],
-    /// Ground texture name
+    /// Ground texture name.
     pub ground: [u8; 10],
-    /// Sky texture name
+    /// Sky texture name.
     pub sky: [u8; 10],
-    /// Vector with all polygons (See Polygon)
+    /// Vector with all polygons (See Polygon).
     pub polygons: Vec<Polygon>,
-    /// Vector with all objects (See Object)
+    /// Vector with all objects (See Object).
     pub objects: Vec<Object>,
-    /// Vector with all pictures (See Picture)
+    /// Vector with all pictures (See Picture).
     pub pictures: Vec<Picture>
 }
 
 impl Level {
-    /// Build a new Level.
+    /// Returns a new Level struct.
     ///
     /// # Examples
     ///
@@ -111,21 +111,35 @@ impl Level {
         }
     }
 
-    /// Parses raw binary level data from self.raw and populates Level fields with information
-    pub fn parse_level (&self) {
+    /// Parses raw binary level data from self.raw and populates Level fields with information.
+    fn parse_level (&self) {
 
     }
 
-    /// Loads level file data into self.raw field then calls self.parse_level()
-    pub fn load_level (&mut self, filename: &str) {
+    /// Loads a level file and returns a Level struct.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let level = elma::lev::Level::load_level("tests/test.lev");
+    /// ```
+    pub fn load_level (filename: &str) -> Level {
+        let mut level = Level::new();
         let mut file = File::open(filename).unwrap();
         let mut buffer = Vec::new();
         file.read_to_end(&mut buffer).unwrap();
-        self.raw = buffer;
-        self.parse_level();
+        level.parse_level();
+        level
     }
 
-    /// Saves self.raw data to a file
+    /// Converts all struct fields into raw binary form and returns it.
+    pub fn get_raw (self) -> Vec<u8> {
+        // TODO: convert all fields.
+        self.parse_level();
+        self.raw
+    }
+
+    /// Saves level as a file
     pub fn save_lev (&self, filename: &str) {
         let mut file = File::create(&filename).unwrap();
         file.write_all(b"Hello, world!").unwrap();
