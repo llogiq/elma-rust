@@ -1,5 +1,6 @@
 use std::io::{ Cursor, Read, Write };
 use std::fs::File;
+use std::ffi::CString;
 use byteorder::{ ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian };
 use super::Position;
 use super::read_n;
@@ -77,7 +78,7 @@ pub struct Level {
     /// Contains four integrity checks (See create_integrity()).
     pub integrity: [f64; 4],
     /// Level name.
-    pub name: String,
+    pub name: CString,
     /// LGR file name.
     pub lgr: [u8; 16],
     /// Ground texture name.
@@ -102,17 +103,17 @@ impl Level {
     /// ```
     pub fn new () -> Level {
         Level {
-            version: String::from("Elma"),
-            raw: Vec::new(),
+            version: "Elma".to_string(),
+            raw: vec![],
             link: 0,
             integrity: [0.0f64; 4],
-            name: String::new(),
+            name: CString::new("").unwrap(),
             lgr: [0; 16],
             ground: [0; 10],
             sky: [0; 10],
-            polygons: Vec::new(),
-            objects: Vec::new(),
-            pictures: Vec::new()
+            polygons: vec![],
+            objects: vec![],
+            pictures: vec![]
         }
     }
 
@@ -126,7 +127,7 @@ impl Level {
     pub fn load_level (filename: &str) -> Level {
         let mut level = Level::new();
         let mut file = File::open(filename).unwrap();
-        let mut buffer = Vec::new();
+        let mut buffer = vec![];
         file.read_to_end(&mut buffer).unwrap();
         level.raw = buffer;
         level.parse_level();
@@ -137,6 +138,7 @@ impl Level {
     fn parse_level (&mut self) {
         let mut buffer = Cursor::new(&self.raw);
         let mut _data :Vec<u8>;
+
         // Elma = POT14, Across = POT06.
         // TODO: make Across compatible in 2025.
         let version = read_n(&mut buffer, 5);
@@ -149,10 +151,24 @@ impl Level {
         // Link.
         _data = read_n(&mut buffer, 2); // Never used
         self.link = buffer.read_u32::<LittleEndian>().unwrap();
-        // integrity checks.
+
+        // Integrity checksums.
         for i in 0..4 {
             self.integrity[i] = buffer.read_f64::<LittleEndian>().unwrap();
         }
+
+        // Level name.
+        let mut name :Vec<u8> = vec![];
+        let mut finished = false;
+        for n in 0..52 {
+            let byte = read_n(&mut buffer, 1);
+            if !finished && byte[0] != 0u8 {
+                name.push(byte[0]);
+            } else if byte[0] == 0u8 {
+                finished = true;
+            }
+        }
+        self.name = CString::new(name).unwrap();
     }
 
     /// Combines the Level struct fields to generate the raw binary data.
