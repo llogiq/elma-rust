@@ -14,6 +14,10 @@ mod tests {
         let level = lev::Level::load_level("tests/test.lev");
         assert_eq!(level.version, "Elma".to_string());
         assert_eq!(level.link, 457242863);
+        assert_eq!(level.integrity, [-1167570.7987087197_f64,
+                                     1182852.7987087197_f64,
+                                     1180817.7987087197_f64,
+                                     1181562.7987087197_f64]);
     }
 
     #[test]

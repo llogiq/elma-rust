@@ -71,7 +71,7 @@ pub struct Level {
     /// Elma or Across level.
     pub version: String,
     /// Raw binary data of a loaded or finalized constructed level.
-    pub raw: Vec<u8>,
+    raw: Vec<u8>,
     /// Random number that links level file to replay files.
     pub link: u32,
     /// Contains four integrity checks (See create_integrity()).
@@ -136,20 +136,23 @@ impl Level {
     /// Parses the raw binary data into Level struct fields.
     fn parse_level (&mut self) {
         let mut buffer = Cursor::new(&self.raw);
-        let data :Vec<u8>;
+        let mut _data :Vec<u8>;
         // Elma = POT14, Across = POT06.
         // TODO: make Across compatible in 2025.
         let version = read_n(&mut buffer, 5);
         self.version = match version.as_slice() {
             [80, 79, 84, 49, 52] => "Elma".to_string(),
             [80, 79, 84, 48, 54] => "Across".to_string(),
-            _ => "".to_string()
+            _ => panic!("Not a valid level file.")
         };
 
         // Link.
-        data = read_n(&mut buffer, 2);
-        let link = buffer.read_u32::<LittleEndian>().unwrap();
-        self.link = link;
+        _data = read_n(&mut buffer, 2); // Never used
+        self.link = buffer.read_u32::<LittleEndian>().unwrap();
+        // integrity checks.
+        for i in 0..4 {
+            self.integrity[i] = buffer.read_f64::<LittleEndian>().unwrap();
+        }
     }
 
     /// Combines the Level struct fields to generate the raw binary data.
