@@ -14,11 +14,11 @@ mod tests {
     fn test_lev_load_level_1 () {
         let level = lev::Level::load_level("tests/test.lev");
         assert_eq!(level.version, "Elma".to_string());
-        assert_eq!(level.link, 457242863);
-        assert_eq!(level.integrity, [-1167570.7987087197,
-                                     1182852.7987087197,
-                                     1180817.7987087197,
-                                     1181562.7987087197]);
+        assert_eq!(level.link, 1524269776);
+        assert_eq!(level.integrity, [-1148375.210607791,
+                                      1164056.210607791,
+                                      1162467.210607791,
+                                      1162283.210607791]);
         assert_eq!(level.name, CString::new("Rust test").unwrap());
     }
 

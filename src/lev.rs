@@ -160,6 +160,9 @@ impl Level {
         // Level name.
         let mut name :Vec<u8> = vec![];
         let mut finished = false;
+        // 51 bytes, read one by one because a null byte can be somewhere in the middle and
+        // CString is not a fan of this apparently? Stop pushing onto the 'name' Vec when we
+        // hit it, but keep reading the remaining x bytes so we end up at the right place. Eh.
         for n in 0..52 {
             let byte = read_n(&mut buffer, 1);
             if !finished && byte[0] != 0u8 {
