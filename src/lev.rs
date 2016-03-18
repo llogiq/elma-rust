@@ -157,16 +157,16 @@ impl Level {
         }
 
         // Level name.
-        self.name = cstring_read(&mut buffer, 51);
+        self.name = cstring_read(read_n(&mut buffer, 51));
 
         // LGR name.
-        self.lgr = cstring_read(&mut buffer, 16);
+        self.lgr = cstring_read(read_n(&mut buffer, 16));
 
         // Ground texture name.
-        self.ground = cstring_read(&mut buffer, 10);
+        self.ground = cstring_read(read_n(&mut buffer, 10));
 
         // Sky texture name.
-        self.sky = cstring_read(&mut buffer, 10);
+        self.sky = cstring_read(read_n(&mut buffer, 10));
     }
 
     /// Combines the Level struct fields to generate the raw binary data.
