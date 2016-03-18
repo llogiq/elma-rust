@@ -2,8 +2,7 @@ use std::io::{ Cursor, Read, Write };
 use std::fs::File;
 use std::ffi::CString;
 use byteorder::{ ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian };
-use super::Position;
-use super::read_n;
+use super::{ cstring_read, Position, read_n };
 use super::rand::Rng;
 
 // Magic arbitrary number; signifies end-of-data. Followed by Top10 list(s).
@@ -80,11 +79,11 @@ pub struct Level {
     /// Level name.
     pub name: CString,
     /// LGR file name.
-    pub lgr: [u8; 16],
+    pub lgr: CString,
     /// Ground texture name.
-    pub ground: [u8; 10],
+    pub ground: CString,
     /// Sky texture name.
-    pub sky: [u8; 10],
+    pub sky: CString,
     /// Vector with all polygons (See Polygon).
     pub polygons: Vec<Polygon>,
     /// Vector with all objects (See Object).
@@ -108,9 +107,9 @@ impl Level {
             link: 0,
             integrity: [0.0f64; 4],
             name: CString::new("").unwrap(),
-            lgr: [0; 16],
-            ground: [0; 10],
-            sky: [0; 10],
+            lgr: CString::new("default").unwrap(),
+            ground: CString::new("ground").unwrap(),
+            sky: CString::new("sky").unwrap(),
             polygons: vec![],
             objects: vec![],
             pictures: vec![]
@@ -158,20 +157,16 @@ impl Level {
         }
 
         // Level name.
-        let mut name :Vec<u8> = vec![];
-        let mut finished = false;
-        // 51 bytes, read one by one because a null byte can be somewhere in the middle and
-        // CString is not a fan of this apparently? Stop pushing onto the 'name' Vec when we
-        // hit it, but keep reading the remaining x bytes so we end up at the right place. Eh.
-        for n in 0..52 {
-            let byte = read_n(&mut buffer, 1);
-            if !finished && byte[0] != 0u8 {
-                name.push(byte[0]);
-            } else if byte[0] == 0u8 {
-                finished = true;
-            }
-        }
-        self.name = CString::new(name).unwrap();
+        self.name = cstring_read(&mut buffer, 51);
+
+        // LGR name.
+        self.lgr = cstring_read(&mut buffer, 16);
+
+        // Ground texture name.
+        self.ground = cstring_read(&mut buffer, 10);
+
+        // Sky texture name.
+        self.sky = cstring_read(&mut buffer, 10);
     }
 
     /// Combines the Level struct fields to generate the raw binary data.
