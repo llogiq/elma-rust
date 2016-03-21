@@ -30,10 +30,11 @@ mod tests {
         assert_eq!(level.ground, CString::new("ground").unwrap());
         assert_eq!(level.sky, CString::new("sky").unwrap());
         assert_eq!(level.polygons.len(), 2);
+        assert_eq!(level.polygons, vec![lev::Polygon::new(), lev::Polygon::new()])
     }
 
     #[test]
-    fn test_rec_default_values_1 () {
+    fn test_rec_default_values () {
         let rec = rec::Rec::new();
         assert_eq!(true, true);
     }

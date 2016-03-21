@@ -9,6 +9,7 @@ pub mod lev;
 pub mod rec;
 
 /// Position struct.
+#[derive(Debug, PartialEq)]
 pub struct Position<T> {
     /// X-position.
     x: T,

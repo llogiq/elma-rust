@@ -1,7 +1,7 @@
 use std::io::{ Cursor, Read, Write };
 use std::fs::File;
 use std::ffi::CString;
-use byteorder::{ ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian };
+use byteorder::{ ReadBytesExt, WriteBytesExt, LittleEndian };
 use super::{ cstring_read, Position, read_n };
 use super::rand::Rng;
 
@@ -37,13 +37,21 @@ pub struct Object {
 }
 
 /// Polygon struct.
+#[derive(Debug, PartialEq)]
 pub struct Polygon {
     /// Grass polygon.
     grass: bool,
-    /// Vertices in Polygon.
-    vertex_count: u32,
     /// Vector with all vertices, see Position struct.
     vertices: Vec<Position<f64>>
+}
+
+impl Polygon {
+    pub fn new () -> Polygon {
+        Polygon {
+            grass: false,
+            vertices: vec![]
+        }
+    }
 }
 
 /// Picture struct.
@@ -166,16 +174,23 @@ impl Level {
         self.sky = cstring_read(read_n(&mut buffer, 10));
 
         // Number of polygons, minus arbitrary 0.4643643...
-        let polycount = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643) as u16;
-        for n in 0..polycount {
-            // TODO: parse them obv.
-            self.polygons.push(Polygon { grass: true, vertex_count: 0, vertices: vec![] })
+        let poly_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643) as u16;
+        for _ in 0..poly_count {
+            let grass = buffer.read_u32::<LittleEndian>().unwrap() > 0;
+            let vertex_count = buffer.read_u32::<LittleEndian>().unwrap();
+            let mut vertices: Vec<Position<f64>> = vec![];
+            for _ in 0..vertex_count {
+                let x = buffer.read_f64::<LittleEndian>().unwrap();
+                let y = buffer.read_f64::<LittleEndian>().unwrap();
+                vertices.push(Position { x: x, y: y });
+            }
+            self.polygons.push(Polygon { grass: grass, vertices: vertices });
         }
     }
 
     /// Combines the Level struct fields to generate the raw binary data.
     fn convert_to_raw (&self) {
-        // TODO: convert duh.
+        // TODO: convert 8)
     }
 
     /// Converts all struct fields into raw binary form and returns it.
