@@ -158,15 +158,19 @@ impl Level {
 
         // Level name.
         self.name = cstring_read(read_n(&mut buffer, 51));
-
         // LGR name.
         self.lgr = cstring_read(read_n(&mut buffer, 16));
-
         // Ground texture name.
         self.ground = cstring_read(read_n(&mut buffer, 10));
-
         // Sky texture name.
         self.sky = cstring_read(read_n(&mut buffer, 10));
+
+        // Number of polygons, minus arbitrary 0.4643643...
+        let polycount = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643) as u16;
+        for n in 0..polycount {
+            // TODO: parse them obv.
+            self.polygons.push(Polygon { grass: true, vertex_count: 0, vertices: vec![] })
+        }
     }
 
     /// Combines the Level struct fields to generate the raw binary data.

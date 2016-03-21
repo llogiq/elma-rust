@@ -29,6 +29,7 @@ mod tests {
         assert_eq!(level.lgr, CString::new("default").unwrap());
         assert_eq!(level.ground, CString::new("ground").unwrap());
         assert_eq!(level.sky, CString::new("sky").unwrap());
+        assert_eq!(level.polygons.len(), 2);
     }
 
     #[test]
