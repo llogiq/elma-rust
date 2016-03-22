@@ -176,7 +176,7 @@ impl Level {
         self.sky = cstring_read(read_n(&mut buffer, 10));
 
         // Polygons.
-        let poly_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643) as u16;
+        let poly_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643).round() as u16;
         for _ in 0..poly_count {
             let grass = buffer.read_u32::<LittleEndian>().unwrap() > 0;
             let vertex_count = buffer.read_u32::<LittleEndian>().unwrap();
@@ -184,13 +184,19 @@ impl Level {
             for _ in 0..vertex_count {
                 let x = buffer.read_f64::<LittleEndian>().unwrap();
                 let y = buffer.read_f64::<LittleEndian>().unwrap();
-                vertices.push(Position { x: x, y: y });
+                vertices.push(Position {
+                    x: x,
+                    y: y
+                });
             }
-            self.polygons.push(Polygon { grass: grass, vertices: vertices });
+            self.polygons.push(Polygon {
+                grass: grass,
+                vertices: vertices
+            });
         }
 
         // Objects.
-        let object_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643) as u16;
+        let object_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643).round() as u16;
         for _ in 0..object_count {
             let x = buffer.read_f64::<LittleEndian>().unwrap();
             let y = buffer.read_f64::<LittleEndian>().unwrap();
@@ -204,15 +210,39 @@ impl Level {
             };
             let gravity = buffer.read_u32::<LittleEndian>().unwrap();
             let animation = buffer.read_u32::<LittleEndian>().unwrap();
-            self.objects.push(Object { position: position, object_type: object_type, gravity: gravity, animation: animation });
+
+            self.objects.push(Object {
+                position: position,
+                object_type: object_type,
+                gravity: gravity,
+                animation: animation
+            });
         }
 
         // Pictures.
-        let picture_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.2345672) as u16;
+        let picture_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.2345672).round() as u16;
         for _ in 0..picture_count {
+            let name = cstring_read(read_n(&mut buffer, 10));
+            let texture = cstring_read(read_n(&mut buffer, 10));
+            let mask = cstring_read(read_n(&mut buffer, 10));
+            let x = buffer.read_f64::<LittleEndian>().unwrap();
+            let y = buffer.read_f64::<LittleEndian>().unwrap();
+            let distance = buffer.read_u32::<LittleEndian>().unwrap();
+            let clip = buffer.read_u32::<LittleEndian>().unwrap();
 
+            self.pictures.push(Picture {
+                name: name,
+                texture: texture,
+                mask: mask,
+                position: Position { x: x, y: y },
+                distance: distance,
+                clip: clip
+            });
         }
 
+        // EOD expected
+        let expected = buffer.read_u32::<LittleEndian>().unwrap();
+        if expected != EOD { panic!("EOD marker mismatch: {:x} != {:x}", expected, EOD); }
     }
 
     /// Combines the Level struct fields to generate the raw binary data.

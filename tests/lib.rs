@@ -30,7 +30,9 @@ mod tests {
         assert_eq!(level.ground, CString::new("ground").unwrap());
         assert_eq!(level.sky, CString::new("sky").unwrap());
         assert_eq!(level.polygons.len(), 2);
-        assert_eq!(level.polygons, vec![lev::Polygon { grass: false, vertices: vec![] }, lev::Polygon { grass: true, vertices: vec![] }])
+        //assert_eq!(level.polygons, vec![lev::Polygon { grass: false, vertices: vec![] }, lev::Polygon { grass: true, vertices: vec![] }]);
+        assert_eq!(level.objects.len(), 8);
+        assert_eq!(level.pictures.len(), 2);
     }
 
     #[test]
