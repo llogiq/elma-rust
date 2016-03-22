@@ -1,6 +1,7 @@
+//! Library for reading and writing Elasto Mania files.
+
 #![doc(html_root_url = "https://hexjelly.github.io/elma-rust/")]
 #![feature(slice_patterns)]
-#[doc(no_inline)]
 extern crate byteorder;
 extern crate rand;
 
@@ -10,7 +11,7 @@ use std::ffi::CString;
 pub mod lev;
 pub mod rec;
 
-/// Position struct.
+/// Shared position struct.
 #[derive(Debug, PartialEq)]
 pub struct Position<T> {
     /// X-position.

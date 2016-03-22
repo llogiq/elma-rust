@@ -1,3 +1,5 @@
+//! Parse and read Elma level files.
+
 use std::io::{ Cursor, Read, Write };
 use std::fs::File;
 use std::ffi::CString;

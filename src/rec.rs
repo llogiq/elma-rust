@@ -1,3 +1,4 @@
+//! Read and write Elma replay files.
 use byteorder::{ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian};
 use super::Position;
 
