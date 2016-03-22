@@ -8,7 +8,6 @@ script:
   - |
       travis-cargo build &&
       travis-cargo test &&
-      travis-cargo bench &&
       travis-cargo --no-deps doc
 after_success:
   - travis-cargo doc-upload
