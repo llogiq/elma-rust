@@ -12,9 +12,9 @@ pub mod rec;
 #[derive(Debug, PartialEq)]
 pub struct Position<T> {
     /// X-position.
-    x: T,
+    pub x: T,
     /// Y-position.
-    y: T
+    pub y: T
 }
 
 /// Read n bytes function.

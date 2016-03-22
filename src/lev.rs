@@ -240,9 +240,9 @@ impl Level {
             });
         }
 
-        // EOD expected
+        // EOD marker expected at this point.
         let expected = buffer.read_u32::<LittleEndian>().unwrap();
-        if expected != EOD { panic!("EOD marker mismatch: {:x} != {:x}", expected, EOD); }
+        if expected != EOD { panic!("EOD marker mismatch: x0{:x} != x0{:x}", expected, EOD); }
     }
 
     /// Combines the Level struct fields to generate the raw binary data.
@@ -257,7 +257,7 @@ impl Level {
     }
 
     /// Saves level as a file.
-    pub fn save_lev (&self, filename: &str) {
+    pub fn save_lev (self, filename: &str) {
         self.convert_to_raw();
         let mut file = File::create(&filename).unwrap();
         // TODO: write stuff.
