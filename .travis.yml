@@ -9,7 +9,7 @@ script:
       travis-cargo build &&
       travis-cargo test &&
       travis-cargo bench &&
-      travis-cargo --no-deps doc
+      travis-cargo doc --no-deps
 after_success:
   - travis-cargo doc-upload
   - travis-cargo coveralls
