@@ -247,7 +247,7 @@ impl Level {
 
     /// Combines the Level struct fields to generate the raw binary data.
     fn convert_to_raw (&self) {
-        // TODO: convert 8)
+        // TODO: convert
     }
 
     /// Converts all struct fields into raw binary form and returns it.
