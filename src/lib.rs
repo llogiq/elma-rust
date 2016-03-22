@@ -1,3 +1,4 @@
+#![doc(html_root_url = "https://hexjelly.github.io/elma-rust/")]
 #![feature(slice_patterns)]
 extern crate byteorder;
 extern crate rand;
