@@ -11,7 +11,7 @@ const EOD: u32 = 0x0067103A;
 const EOF: u32 = 0x00845D52;
 
 /// Type of object.
-enum ObjectType {
+pub enum ObjectType {
     Apple,
     Exit,
     Killer,
@@ -21,9 +21,9 @@ enum ObjectType {
 /// Object struct. Every level requires one ObjectType::Player Object and at least one ObjectType::Exit Object.
 pub struct Object {
     /// Position. See Position struct.
-    position: Position<f64>,
+    pub position: Position<f64>,
     /// Type of Object, see ObjectType.
-    object_type: ObjectType,
+    pub object_type: ObjectType,
     /// Applies to ObjectType::Apple only.
     ///
     /// 0 = normal
@@ -31,18 +31,19 @@ pub struct Object {
     /// 2 = gravity down
     /// 3 = gravity left
     /// 4 = gravity right
-    gravity: u32,
+    // TODO: enum with gravity
+    pub gravity: u32,
     /// Applies to ObjectType::Apple only. Valid values are 1 to 9.
-    animation: u32
+    pub animation: u32
 }
 
 /// Polygon struct.
 #[derive(Debug, PartialEq)]
 pub struct Polygon {
     /// Grass polygon.
-    grass: bool,
+    pub grass: bool,
     /// Vector with all vertices, see Position struct.
-    vertices: Vec<Position<f64>>
+    pub vertices: Vec<Position<f64>>
 }
 
 impl Polygon {
@@ -57,21 +58,22 @@ impl Polygon {
 /// Picture struct.
 pub struct Picture {
     /// Picture name.
-    name: [u8; 10],
+    pub name: CString,
     /// Texture name.
-    texture: [u8; 10],
+    pub texture: CString,
     /// Mask name.
-    mask: [u8; 10],
+    pub mask: CString,
     /// Position. See Position struct.
-    position: Position<f64>,
+    pub position: Position<f64>,
     /// Z-distance
-    distance: u32,
+    pub distance: u32,
     /// Clipping.
     ///
     /// 0 = unclipped
     /// 1 = ground
     /// 2 = sky
-    clip: u32
+    // TODO: make enum
+    pub clip: u32
 }
 
 /// Level struct that contains all level information.
@@ -173,7 +175,7 @@ impl Level {
         // Sky texture name.
         self.sky = cstring_read(read_n(&mut buffer, 10));
 
-        // Number of polygons, minus arbitrary 0.4643643...
+        // Polygons.
         let poly_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643) as u16;
         for _ in 0..poly_count {
             let grass = buffer.read_u32::<LittleEndian>().unwrap() > 0;
@@ -186,6 +188,31 @@ impl Level {
             }
             self.polygons.push(Polygon { grass: grass, vertices: vertices });
         }
+
+        // Objects.
+        let object_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643) as u16;
+        for _ in 0..object_count {
+            let x = buffer.read_f64::<LittleEndian>().unwrap();
+            let y = buffer.read_f64::<LittleEndian>().unwrap();
+            let position = Position { x: x, y: y };
+            let object_type = match buffer.read_u32::<LittleEndian>().unwrap() {
+                1 => ObjectType::Exit,
+                2 => ObjectType::Apple,
+                3 => ObjectType::Killer,
+                4 => ObjectType::Player,
+                _ => panic!("Not a valid object type")
+            };
+            let gravity = buffer.read_u32::<LittleEndian>().unwrap();
+            let animation = buffer.read_u32::<LittleEndian>().unwrap();
+            self.objects.push(Object { position: position, object_type: object_type, gravity: gravity, animation: animation });
+        }
+
+        // Pictures.
+        let picture_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.2345672) as u16;
+        for _ in 0..picture_count {
+
+        }
+
     }
 
     /// Combines the Level struct fields to generate the raw binary data.
