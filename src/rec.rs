@@ -1,11 +1,15 @@
 //! Read and write Elma replay files.
-use byteorder::{ReadBytesExt, WriteBytesExt, BigEndian, LittleEndian};
-use super::Position;
+use std::io::{ Cursor, Read, Write };
+use std::fs::File;
+use std::ffi::CString;
+use byteorder::{ ReadBytesExt, WriteBytesExt, LittleEndian };
+use super::{ cstring_read, Position, read_n };
 
 // Magic arbitrary number to signify end of replay file.
 const EOR: u32 = 0x00492F75;
 
 /// One frame of replay.
+#[derive(Debug, PartialEq)]
 pub struct Frame {
     /// Bike position?
     pub bike: Position<f32>,
@@ -29,6 +33,7 @@ pub struct Frame {
     pub volume: u16
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Event {
     /// Time of event.
     pub time: f64,
@@ -47,11 +52,9 @@ pub struct Rec {
     /// Random number to link with level file.
     pub link: u32,
     /// Full level filename.
-    pub level: [u8; 12],
+    pub level: CString,
     /// Vector with Frame structs.
     pub frames: Vec<Frame>,
-    /// Number of replay events.
-    pub event_count: i32,
     /// Events.
     pub events: Vec<Event>
 }
@@ -70,10 +73,20 @@ impl Rec {
             multi: false,
             flag_tag: false,
             link: 0,
-            level: [0; 12],
-            frames: Vec::new(),
-            event_count: 0,
-            events: Vec::new()
+            level: CString::new("").unwrap(),
+            frames: vec![],
+            events: vec![]
         }
+    }
+
+    /// Loads a replay file and returns a Rec struct.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let rec = elma::rec::Rec::load_replay("tests/test.rec");
+    /// ```
+    pub fn load_replay (filename: &str) -> Rec {
+        Rec::new()
     }
 }

@@ -41,6 +41,12 @@ mod tests {
     #[test]
     fn test_rec_default_values () {
         let rec = rec::Rec::new();
-        assert_eq!(true, true);
+        assert_eq!(rec.frame_count, 0);
+        assert_eq!(rec.multi, false);
+        assert_eq!(rec.flag_tag, false);
+        assert_eq!(rec.link, 0);
+        assert_eq!(rec.level, CString::new("").unwrap());
+        assert_eq!(rec.frames, vec![]);
+        assert_eq!(rec.events, vec![]);
     }
 }
