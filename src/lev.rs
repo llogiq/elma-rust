@@ -8,9 +8,9 @@ use super::{ cstring_read, Position, read_n };
 use super::rand::Rng;
 
 // Magic arbitrary number; signifies end-of-data. Followed by Top10 list(s).
-const EOD: u32 = 0x0067103A;
+const EOD: i32 = 0x0067103A;
 // Magic arbitrary number; signifies end-of-file.
-const EOF: u32 = 0x00845D52;
+const EOF: i32 = 0x00845D52;
 
 /// Type of object.
 pub enum ObjectType {
@@ -34,9 +34,9 @@ pub struct Object {
     /// 3 = gravity left
     /// 4 = gravity right
     // TODO: enum with gravity
-    pub gravity: u32,
+    pub gravity: i32,
     /// Applies to ObjectType::Apple only. Valid values are 1 to 9.
-    pub animation: u32
+    pub animation: i32
 }
 
 /// Polygon struct.
@@ -68,14 +68,14 @@ pub struct Picture {
     /// Position. See Position struct.
     pub position: Position<f64>,
     /// Z-distance
-    pub distance: u32,
+    pub distance: i32,
     /// Clipping.
     ///
     /// 0 = unclipped
     /// 1 = ground
     /// 2 = sky
     // TODO: make enum
-    pub clip: u32
+    pub clip: i32
 }
 
 /// Top10 list entry struct.
@@ -93,7 +93,7 @@ pub struct Level {
     /// Raw binary data of a loaded or finalized constructed level.
     raw: Vec<u8>,
     /// Random number that links level file to replay files.
-    pub link: u32,
+    pub link: i32,
     /// Contains four integrity checks (See create_integrity()).
     pub integrity: [f64; 4],
     /// Level name.
@@ -175,7 +175,7 @@ impl Level {
 
         // Link.
         _data = read_n(&mut buffer, 2); // Never used
-        self.link = buffer.read_u32::<LittleEndian>().unwrap();
+        self.link = buffer.read_i32::<LittleEndian>().unwrap();
 
         // Integrity checksums.
         for i in 0..4 {
@@ -194,8 +194,8 @@ impl Level {
         // Polygons.
         let poly_count = (buffer.read_f64::<LittleEndian>().unwrap() - 0.4643643).round() as u16;
         for _ in 0..poly_count {
-            let grass = buffer.read_u32::<LittleEndian>().unwrap() > 0;
-            let vertex_count = buffer.read_u32::<LittleEndian>().unwrap();
+            let grass = buffer.read_i32::<LittleEndian>().unwrap() > 0;
+            let vertex_count = buffer.read_i32::<LittleEndian>().unwrap();
             let mut vertices: Vec<Position<f64>> = vec![];
             for _ in 0..vertex_count {
                 let x = buffer.read_f64::<LittleEndian>().unwrap();
@@ -217,15 +217,15 @@ impl Level {
             let x = buffer.read_f64::<LittleEndian>().unwrap();
             let y = buffer.read_f64::<LittleEndian>().unwrap();
             let position = Position { x: x, y: y };
-            let object_type = match buffer.read_u32::<LittleEndian>().unwrap() {
+            let object_type = match buffer.read_i32::<LittleEndian>().unwrap() {
                 1 => ObjectType::Exit,
                 2 => ObjectType::Apple,
                 3 => ObjectType::Killer,
                 4 => ObjectType::Player,
                 _ => panic!("Not a valid object type")
             };
-            let gravity = buffer.read_u32::<LittleEndian>().unwrap();
-            let animation = buffer.read_u32::<LittleEndian>().unwrap();
+            let gravity = buffer.read_i32::<LittleEndian>().unwrap();
+            let animation = buffer.read_i32::<LittleEndian>().unwrap();
 
             self.objects.push(Object {
                 position: position,
@@ -243,8 +243,8 @@ impl Level {
             let mask = cstring_read(read_n(&mut buffer, 10));
             let x = buffer.read_f64::<LittleEndian>().unwrap();
             let y = buffer.read_f64::<LittleEndian>().unwrap();
-            let distance = buffer.read_u32::<LittleEndian>().unwrap();
-            let clip = buffer.read_u32::<LittleEndian>().unwrap();
+            let distance = buffer.read_i32::<LittleEndian>().unwrap();
+            let clip = buffer.read_i32::<LittleEndian>().unwrap();
 
             self.pictures.push(Picture {
                 name: name,
@@ -257,7 +257,7 @@ impl Level {
         }
 
         // EOD marker expected at this point.
-        let expected = buffer.read_u32::<LittleEndian>().unwrap();
+        let expected = buffer.read_i32::<LittleEndian>().unwrap();
         if expected != EOD { panic!("EOD marker mismatch: x0{:x} != x0{:x}", expected, EOD); }
 
         // Top10 single-player list.

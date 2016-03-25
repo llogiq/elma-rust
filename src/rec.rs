@@ -14,13 +14,13 @@ pub struct Frame {
     /// Bike position?
     pub bike: Position<f32>,
     /// Left wheel position.
-    pub left_wheel: Position<i16>,
+    pub left_wheel: Position<u16>,
     /// Right wheel position.
-    pub right_wheel: Position<i16>,
+    pub right_wheel: Position<u16>,
     /// Head position.
-    pub head: Position<i16>,
+    pub head: Position<u16>,
     /// Bike rotation. Range 0..10000.
-    pub rotation: i16,
+    pub rotation: u16,
     /// Left wheel rotation. Range 0..255.
     pub left_wheel_rotation: u8,
     /// Right wheel rotation. Range 0..255.
