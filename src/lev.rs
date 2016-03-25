@@ -1,4 +1,4 @@
-//! Parse and read Elma level files.
+//! Read and write Elma level files.
 
 use std::io::{ Cursor, Read, Write };
 use std::fs::File;
@@ -78,6 +78,14 @@ pub struct Picture {
     pub clip: u32
 }
 
+/// Top10 list entry struct.
+pub struct ListEntry {
+    /// Player name.
+    pub name: CString,
+    /// Time.
+    pub time: f64
+}
+
 /// Level struct that contains all level information.
 pub struct Level {
     /// Elma or Across level.
@@ -101,7 +109,11 @@ pub struct Level {
     /// Vector with all objects (See Object).
     pub objects: Vec<Object>,
     /// Vector with all pictures (See Picture).
-    pub pictures: Vec<Picture>
+    pub pictures: Vec<Picture>,
+    /// Vector of Top10 single-player names and times.
+    pub top10_single: Vec<ListEntry>,
+    /// Vector of Top10 multi-player names and times.
+    pub top10_multi: Vec<ListEntry>
 }
 
 impl Level {
@@ -124,7 +136,9 @@ impl Level {
             sky: CString::new("sky").unwrap(),
             polygons: vec![],
             objects: vec![],
-            pictures: vec![]
+            pictures: vec![],
+            top10_single: vec![],
+            top10_multi: vec![]
         }
     }
 
@@ -245,6 +259,12 @@ impl Level {
         // EOD marker expected at this point.
         let expected = buffer.read_u32::<LittleEndian>().unwrap();
         if expected != EOD { panic!("EOD marker mismatch: x0{:x} != x0{:x}", expected, EOD); }
+
+        // Top10 single-player list.
+        // TODO: do it
+
+        // Top10 multi-player list.
+        // TODO: do it
     }
 
     /// Combines the Level struct fields to generate the raw binary data.
