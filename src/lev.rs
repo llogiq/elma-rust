@@ -260,11 +260,18 @@ impl Level {
         let expected = buffer.read_i32::<LittleEndian>().unwrap();
         if expected != EOD { panic!("EOD marker mismatch: x0{:x} != x0{:x}", expected, EOD); }
 
-        // Top10 single-player list.
+        // First decrypt the top10 blocks.
+        let decrypted_top10_data = decrypt_top10(read_n(&mut buffer, 688));
+
+        // Single-player list.
         // TODO: do it
 
-        // Top10 multi-player list.
+        // Multi-player list.
         // TODO: do it
+
+        // EOF marker expected at this point.
+        let expected = buffer.read_i32::<LittleEndian>().unwrap();
+        if expected != EOF { panic!("EOF marker mismatch: x0{:x} != x0{:x}", expected, EOF); }
     }
 
     /// Combines the Level struct fields to generate the raw binary data.
@@ -284,4 +291,19 @@ impl Level {
         let mut file = File::create(&filename).unwrap();
         // TODO: write stuff.
     }
+}
+
+/// Decrypt top10 list data.
+fn decrypt_top10 (mut top10: Vec<u8>) -> Vec<u8> {
+    // Who knows
+    let mut ebp8: i16 = 0x15;
+    let mut ebp10: i16 = 0x2637;
+
+    for n in 0..688 {
+        top10[n] ^= (ebp8 & 0xFF) as u8;
+        ebp10 = ebp10.wrapping_add((ebp8.wrapping_rem(0xD3D)).wrapping_mul(0xD3D));
+        ebp8 = ebp10.wrapping_mul(0x1F).wrapping_add(0xD3D);
+    }
+
+    top10
 }
