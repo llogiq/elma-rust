@@ -1,8 +1,21 @@
 extern crate elma;
+extern crate rand;
 #[cfg(test)]
 mod tests {
     use elma::{ lev, rec };
     use std::ffi::CString;
+    use rand::random;
+
+    #[test]
+    fn test_decrypt_encrypt () {
+        let mut initial: Vec<u8> = vec![];
+        for _ in 0..688 {
+            initial.push(random::<u8>());
+        }
+        let decrypted = lev::crypt_top10(initial.clone());
+        let encrypted = lev::crypt_top10(decrypted);
+        assert_eq!(initial, encrypted);
+    }
 
     #[test]
     fn test_lev_default_values () {

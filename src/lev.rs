@@ -261,7 +261,7 @@ impl Level {
         if expected != EOD { panic!("EOD marker mismatch: x0{:x} != x0{:x}", expected, EOD); }
 
         // First decrypt the top10 blocks.
-        let decrypted_top10_data = decrypt_top10(read_n(&mut buffer, 688));
+        let decrypted_top10_data = crypt_top10(read_n(&mut buffer, 688));
 
         // Single-player list.
         // TODO: do it
@@ -293,8 +293,8 @@ impl Level {
     }
 }
 
-/// Decrypt top10 list data.
-fn decrypt_top10 (mut top10: Vec<u8>) -> Vec<u8> {
+/// Decrypt and encrypt top10 list data. Same algorithm for both.
+pub fn crypt_top10 (mut top10: Vec<u8>) -> Vec<u8> {
     // Who knows
     let mut ebp8: i16 = 0x15;
     let mut ebp10: i16 = 0x2637;

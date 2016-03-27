@@ -7,6 +7,7 @@ extern crate rand;
 
 use std::io::Read;
 use std::ffi::CString;
+use rand::random;
 
 pub mod lev;
 pub mod rec;
