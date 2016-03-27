@@ -3,7 +3,7 @@
 use std::io::{ Cursor, Read, Write };
 use std::fs::File;
 use std::ffi::CString;
-use byteorder::{ ReadBytesExt, WriteBytesExt, LittleEndian };
+use byteorder::{ ByteOrder, ReadBytesExt, WriteBytesExt, LittleEndian };
 use super::{ cstring_read, Position, read_n };
 use super::rand::Rng;
 
@@ -79,11 +79,14 @@ pub struct Picture {
 }
 
 /// Top10 list entry struct.
+#[derive(Debug)]
 pub struct ListEntry {
-    /// Player name.
-    pub name: CString,
+    /// Player 1 name.
+    pub name_1: CString,
+    /// Player 2 name.
+    pub name_2: CString,
     /// Time.
-    pub time: f64
+    pub time: i32
 }
 
 /// Level struct that contains all level information.
@@ -225,7 +228,7 @@ impl Level {
                 _ => panic!("Not a valid object type")
             };
             let gravity = buffer.read_i32::<LittleEndian>().unwrap();
-            let animation = buffer.read_i32::<LittleEndian>().unwrap();
+            let animation = buffer.read_i32::<LittleEndian>().unwrap() + 1;
 
             self.objects.push(Object {
                 position: position,
@@ -264,10 +267,44 @@ impl Level {
         let decrypted_top10_data = crypt_top10(read_n(&mut buffer, 688));
 
         // Single-player list.
-        // TODO: do it
+        let single = &decrypted_top10_data[0..344];
+        let times = LittleEndian::read_i32(&single[0..4]);
+        for n in 0..times {
+            let time_offset: usize = (4 + n * 4) as usize;
+            let time_end: usize = time_offset + 4;
+            let name_offset: usize = (44 + n * 15) as usize;
+            let name_end: usize = name_offset + 15;
+            // All of this pains me even though I don't understand it...
+            let mut name = Vec::new();
+            name.extend_from_slice(&single[name_offset..name_end]);
+            self.top10_single.push(ListEntry {
+                time: LittleEndian::read_i32(&single[time_offset..time_end]),
+                name_1: cstring_read(name),
+                name_2: CString::new("").unwrap()
+            });
+        }
 
         // Multi-player list.
-        // TODO: do it
+        let multi = &decrypted_top10_data[344..688];
+        let times = LittleEndian::read_i32(&multi[0..4]);
+        for n in 0..times {
+            let time_offset: usize = (4 + n * 4) as usize;
+            let time_end: usize = time_offset + 4;
+            let name_offset: usize = (44 + n * 15) as usize;
+            let name_end: usize = name_offset + 15;
+            let name2_offset: usize = (194 + n * 15) as usize;
+            let name2_end: usize = name2_offset + 15;
+            // All of this pains me even though I don't understand it...
+            let mut name = Vec::new();
+            let mut name2 = Vec::new();
+            name.extend_from_slice(&multi[name_offset..name_end]);
+            name2.extend_from_slice(&multi[name2_offset..name2_end]);
+            self.top10_multi.push(ListEntry {
+                time: LittleEndian::read_i32(&multi[time_offset..time_end]),
+                name_1: cstring_read(name),
+                name_2: cstring_read(name2)
+            });
+        }
 
         // EOF marker expected at this point.
         let expected = buffer.read_i32::<LittleEndian>().unwrap();
