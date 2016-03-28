@@ -1,4 +1,4 @@
-//! Read and write Elma replay files.
+//! Read and write Elasto Mania replay files.
 use std::io::{ Cursor, Read, Write };
 use std::fs::File;
 use std::ffi::CString;

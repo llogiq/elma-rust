@@ -1,4 +1,4 @@
-//! Read and write Elma level files.
+//! Read and write Elasto Mania level files.
 
 use std::io::{ Cursor, Read, Write };
 use std::fs::File;
@@ -268,43 +268,11 @@ impl Level {
 
         // Single-player list.
         let single = &decrypted_top10_data[0..344];
-        let times = LittleEndian::read_i32(&single[0..4]);
-        for n in 0..times {
-            let time_offset: usize = (4 + n * 4) as usize;
-            let time_end: usize = time_offset + 4;
-            let name_offset: usize = (44 + n * 15) as usize;
-            let name_end: usize = name_offset + 15;
-            // All of this pains me even though I don't understand it...
-            let mut name = Vec::new();
-            name.extend_from_slice(&single[name_offset..name_end]);
-            self.top10_single.push(ListEntry {
-                time: LittleEndian::read_i32(&single[time_offset..time_end]),
-                name_1: cstring_read(name),
-                name_2: CString::new("").unwrap()
-            });
-        }
+        self.top10_single = parse_top10(single);
 
         // Multi-player list.
         let multi = &decrypted_top10_data[344..688];
-        let times = LittleEndian::read_i32(&multi[0..4]);
-        for n in 0..times {
-            let time_offset: usize = (4 + n * 4) as usize;
-            let time_end: usize = time_offset + 4;
-            let name_offset: usize = (44 + n * 15) as usize;
-            let name_end: usize = name_offset + 15;
-            let name2_offset: usize = (194 + n * 15) as usize;
-            let name2_end: usize = name2_offset + 15;
-            // All of this pains me even though I don't understand it...
-            let mut name = Vec::new();
-            let mut name2 = Vec::new();
-            name.extend_from_slice(&multi[name_offset..name_end]);
-            name2.extend_from_slice(&multi[name2_offset..name2_end]);
-            self.top10_multi.push(ListEntry {
-                time: LittleEndian::read_i32(&multi[time_offset..time_end]),
-                name_1: cstring_read(name),
-                name_2: cstring_read(name2)
-            });
-        }
+        self.top10_multi = parse_top10(multi);
 
         // EOF marker expected at this point.
         let expected = buffer.read_i32::<LittleEndian>().unwrap();
@@ -343,4 +311,28 @@ pub fn crypt_top10 (mut top10: Vec<u8>) -> Vec<u8> {
     }
 
     top10
+}
+
+pub fn parse_top10 (top10: &[u8]) -> Vec<ListEntry> {
+    let mut list: Vec<ListEntry> = vec![];
+    let times = LittleEndian::read_i32(&top10[0..4]);
+    for n in 0..times {
+        let time_offset: usize = (4 + n * 4) as usize;
+        let time_end: usize = time_offset + 4;
+        let name_offset: usize = (44 + n * 15) as usize;
+        let name_end: usize = name_offset + 15;
+        let name2_offset: usize = (194 + n * 15) as usize;
+        let name2_end: usize = name2_offset + 15;
+        // All of this pains me even though I don't understand it...
+        let mut name = vec![];
+        let mut name2 = vec![];
+        name.extend_from_slice(&top10[name_offset..name_end]);
+        name2.extend_from_slice(&top10[name2_offset..name2_end]);
+        list.push(ListEntry {
+            time: LittleEndian::read_i32(&top10[time_offset..time_end]),
+            name_1: cstring_read(name),
+            name_2: cstring_read(name2)
+        });
+    }
+    list
 }
