@@ -20,7 +20,7 @@ mod tests {
     #[test]
     fn test_lev_default_values () {
         let level = lev::Level::new();
-        assert_eq!(level.version, "Elma".to_string());
+        assert_eq!(level.version, lev::Version::Elma);
         assert_eq!(level.link, 0);
         assert_eq!(level.integrity, [0.0_f64; 4]);
         assert_eq!(level.name, CString::new("").unwrap());
@@ -32,7 +32,7 @@ mod tests {
     #[test]
     fn test_lev_load_level () {
         let level = lev::Level::load_level("tests/test.lev");
-        assert_eq!(level.version, "Elma".to_string());
+        assert_eq!(level.version, lev::Version::Elma);
         assert_eq!(level.link, 1524269776);
         assert_eq!(level.integrity, [-1148375.210607791,
                                       1164056.210607791,

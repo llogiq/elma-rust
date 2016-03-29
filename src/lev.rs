@@ -12,7 +12,15 @@ const EOD: i32 = 0x0067103A;
 // Magic arbitrary number; signifies end-of-file.
 const EOF: i32 = 0x00845D52;
 
+/// Game version.
+#[derive(Debug, PartialEq)]
+pub enum Version {
+    Across,
+    Elma
+}
+
 /// Type of object.
+#[derive(Debug, PartialEq)]
 pub enum ObjectType {
     Apple,
     Exit,
@@ -21,6 +29,7 @@ pub enum ObjectType {
 }
 
 /// Object struct. Every level requires one ObjectType::Player Object and at least one ObjectType::Exit Object.
+#[derive(Debug, PartialEq)]
 pub struct Object {
     /// Position. See Position struct.
     pub position: Position<f64>,
@@ -92,7 +101,7 @@ pub struct ListEntry {
 /// Level struct that contains all level information.
 pub struct Level {
     /// Elma or Across level.
-    pub version: String,
+    pub version: Version,
     /// Raw binary data of a loaded or finalized constructed level.
     raw: Vec<u8>,
     /// Random number that links level file to replay files.
@@ -129,7 +138,7 @@ impl Level {
     /// ```
     pub fn new () -> Level {
         Level {
-            version: "Elma".to_string(),
+            version: Version::Elma,
             raw: vec![],
             link: 0,
             integrity: [0.0f64; 4],
@@ -171,8 +180,8 @@ impl Level {
         // TODO: make Across compatible in 2025.
         let version = read_n(&mut buffer, 5);
         self.version = match version.as_slice() {
-            [80, 79, 84, 49, 52] => "Elma".to_string(),
-            [80, 79, 84, 48, 54] => "Across".to_string(),
+            [80, 79, 84, 49, 52] => Version::Elma,
+            [80, 79, 84, 48, 54] => Version::Across,
             _ => panic!("Not a valid level file.")
         };
 
@@ -279,20 +288,21 @@ impl Level {
         if expected != EOF { panic!("EOF marker mismatch: x0{:x} != x0{:x}", expected, EOF); }
     }
 
-    /// Combines the Level struct fields to generate the raw binary data.
-    fn convert_to_raw (&self) {
+    /// Combines the Level struct fields to generate the raw binary data,
+    /// and calculate integrity sums.
+    fn update (&self) {
         // TODO: convert
     }
 
     /// Converts all struct fields into raw binary form and returns it.
     pub fn get_raw (self) -> Vec<u8> {
-        self.convert_to_raw();
+        self.update();
         self.raw
     }
 
     /// Saves level as a file.
     pub fn save_lev (self, filename: &str) {
-        self.convert_to_raw();
+        self.update();
         let mut file = File::create(&filename).unwrap();
         // TODO: write stuff.
     }
@@ -313,6 +323,7 @@ pub fn crypt_top10 (mut top10: Vec<u8>) -> Vec<u8> {
     top10
 }
 
+/// Parse top10 lists and return a vector of ListEntrys
 pub fn parse_top10 (top10: &[u8]) -> Vec<ListEntry> {
     let mut list: Vec<ListEntry> = vec![];
     let times = LittleEndian::read_i32(&top10[0..4]);
